@@ -2,11 +2,12 @@
   <el-scrollbar class="scroll">
     <div>
       <div class="title" >
-        <Icon icon="mdi:email-outline" width="24" height="24" />
-        <div>{{settingStore.settings.title}}</div>
+        <a class="mail-brand" href="https://g3rry.com/" :aria-label="$t('backToPersonalSite')">
+          <span>g3rry<span class="brand-dot" aria-hidden="true">.</span></span><small>Mail</small>
+        </a>
         <button type="button" class="close-navigation" :aria-label="$t('closeNavigation')" @click="uiStore.asideShow = false"><Icon icon="mdi:close" width="22" height="22" aria-hidden="true"/></button>
       </div>
-      <el-menu :collapse="false" text-color="#fff" active-text-color="#fff" style="margin-top: 10px">
+      <el-menu :collapse="false" style="margin-top: 10px">
         <el-menu-item @click="router.push({name: 'email'})" index="email"
                       :class="route.meta.name === 'email' ? 'choose-item' : ''">
           <Icon icon="hugeicons:mailbox-01" width="20" height="20" />
@@ -97,8 +98,8 @@ const route = useRoute();
   align-items: center;
   justify-content: center;
   gap: 5px;
-  color: #ffffff;
-  background: linear-gradient(135deg, #1890ff, #3a80dd);
+  color: var(--mail-text);
+  background: var(--mail-page);
   transition: all 0.3s ease;
   max-width: 240px;
   padding: 0 10px;
@@ -128,7 +129,7 @@ const route = useRoute();
 .manage-title {
   margin-top: 10px;
   padding-left: 20px;
-  color: #fff;
+  color: var(--mail-muted);
 }
 
 .el-menu-item {
@@ -140,13 +141,12 @@ const route = useRoute();
 
 .choose-item {
   font-weight: bold;
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(4px);
+  background: var(--mail-selected);
 }
 
 @media (hover: hover) {
   .el-menu-item:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--mail-hover);
   }
 }
 

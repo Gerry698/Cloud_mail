@@ -1,21 +1,27 @@
 <template>
-  <div id="login-box" :style=" background ? 'background: var(--el-bg-color)' : ''" v-loading="oauthLoading" element-loading-text="登录中...">
-    <div id="background-wrap" v-if="!settingStore.settings.background">
-      <div class="x1 cloud"></div>
-      <div class="x2 cloud"></div>
-      <div class="x3 cloud"></div>
-      <div class="x4 cloud"></div>
-      <div class="x5 cloud"></div>
-    </div>
-    <div v-else :style="background"></div>
+  <div id="login-box" v-loading="oauthLoading" element-loading-text="登录中...">
+    <div v-if="settingStore.settings.background" class="login-custom-background" :style="background" aria-hidden="true"></div>
+    <header class="login-brandbar">
+      <a class="mail-brand" href="https://g3rry.com/" :aria-label="$t('backToPersonalSite')">
+        <span>g3rry<span class="brand-dot" aria-hidden="true">.</span></span><small>Mail</small>
+      </a>
+      <a class="login-home" href="https://g3rry.com/">g3rry.com <span aria-hidden="true">↗</span></a>
+    </header>
+    <section class="login-intro" aria-labelledby="mail-welcome-title">
+      <p class="login-eyebrow"><span aria-hidden="true"></span>{{ $t('personalMail') }}</p>
+      <h1 id="mail-welcome-title">Keeping <br>in touch<span aria-hidden="true">.</span></h1>
+      <p class="login-note">{{ $t('mailWelcome') }}</p>
+      <div class="correspondence-mark" aria-hidden="true"><span>G.Z.</span><span>01 / Correspondence</span></div>
+    </section>
     <div class="form-wrapper">
       <div class="container">
-        <span class="form-title">{{ settingStore.settings.title }}</span>
+        <p class="form-eyebrow">MAIL / {{ $t('personalMail') }}</p>
+        <h2 class="form-title">{{ settingStore.settings.title }}<span aria-hidden="true">.</span></h2>
         <span class="form-desc" v-if="show === 'login'">{{ $t('loginTitle') }}</span>
         <span class="form-desc" v-else>{{ $t('regTitle') }}</span>
         <div v-show="show === 'login'">
           <el-input :class="settingStore.settings.loginDomain === 0 ? 'email-input' : ''" v-model="form.email"
-                    type="text" :placeholder="$t('emailAccount')" autocomplete="off">
+                    type="text" :placeholder="$t('emailAccount')" :aria-label="$t('emailAccount')" autocomplete="off">
             <template #append v-if="settingStore.settings.loginDomain === 0">
               <div @click.stop="openSelect">
                 <el-select
@@ -39,7 +45,7 @@
               </div>
             </template>
           </el-input>
-          <el-input v-model="form.password" :placeholder="$t('password')" type="password" autocomplete="off">
+          <el-input v-model="form.password" :placeholder="$t('password')" :aria-label="$t('password')" type="password" autocomplete="off">
           </el-input>
           <el-button class="btn" type="primary" @click="submit" :loading="loginLoading"
           >{{ $t('loginBtn') }}
@@ -49,7 +55,7 @@
           </el-button>
         </div>
         <div v-show="show !== 'login'">
-          <el-input class="email-input" v-model="registerForm.email" type="text" :placeholder="$t('emailAccount')"
+          <el-input class="email-input" v-model="registerForm.email" type="text" :placeholder="$t('emailAccount')" :aria-label="$t('emailAccount')"
                     autocomplete="off">
             <template #append>
               <div @click.stop="openSelect">
@@ -74,8 +80,8 @@
               </div>
             </template>
           </el-input>
-          <el-input v-model="registerForm.password" :placeholder="$t('password')" type="password" autocomplete="off"/>
-          <el-input v-model="registerForm.confirmPassword" :placeholder="$t('confirmPwd')" type="password"
+          <el-input v-model="registerForm.password" :placeholder="$t('password')" :aria-label="$t('password')" type="password" autocomplete="off"/>
+          <el-input v-model="registerForm.confirmPassword" :placeholder="$t('confirmPwd')" :aria-label="$t('confirmPwd')" type="password"
                     autocomplete="off"/>
           <el-input v-if="settingStore.settings.regKey === 0" v-model="registerForm.code" :placeholder="$t('regKey')"
                     type="text" autocomplete="off"/>
@@ -99,16 +105,16 @@
           </el-button>
         </div>
         <template v-if="settingStore.settings.register === 0">
-          <div class="switch" @click="show = 'register'" v-if="show === 'login'">{{ $t('noAccount') }}
-            <span>{{ $t('regSwitch') }}</span></div>
-          <div class="switch" @click="show = 'login'" v-else>{{ $t('hasAccount') }} <span>{{ $t('loginSwitch') }}</span>
-          </div>
+          <button type="button" class="switch" @click="show = 'register'" v-if="show === 'login'">{{ $t('noAccount') }}
+            <span>{{ $t('regSwitch') }}</span></button>
+          <button type="button" class="switch" @click="show = 'login'" v-else>{{ $t('hasAccount') }} <span>{{ $t('loginSwitch') }}</span>
+          </button>
         </template>
       </div>
     </div>
     <el-dialog class="bind-dialog" v-model="showBindForm"  title="注册邮箱" >
       <div class="bind-container">
-        <el-input v-model="bindForm.email" type="text" :placeholder="$t('emailAccount')" autocomplete="off">
+        <el-input v-model="bindForm.email" type="text" :placeholder="$t('emailAccount')" :aria-label="$t('emailAccount')" autocomplete="off">
           <template #append>
             <div @click.stop="openSelect">
               <el-select
@@ -140,9 +146,7 @@
         </el-button>
       </div>
     </el-dialog>
-    <a class="github" href="https://github.com/maillab/cloud-mail">
-      <Icon icon="mingcute:github-line" color="#1890ff" width="20" height="20" />
-    </a>
+    <footer class="login-footer"><span>GERRY ZHAO / MAIL</span><a href="https://github.com/maillab/cloud-mail">Cloud Mail <span aria-hidden="true">↗</span></a></footer>
   </div>
 </template>
 
@@ -232,8 +236,10 @@ window.loadBefore = (e) => {
 }
 
 const loginOpacity = computed(() => {
-  const opacity = settingStore.settings.loginOpacity
-  return uiStore.dark ? `rgba(0, 0, 0, ${opacity})` : `rgba(255, 255, 255, ${opacity})`
+  const opacity = Number(settingStore.settings.loginOpacity)
+  return settingStore.settings.background && Number.isFinite(opacity)
+      ? `color-mix(in srgb, var(--mail-panel) ${Math.min(1, Math.max(0, opacity)) * 100}%, transparent)`
+      : 'var(--mail-panel)'
 })
 
 const background = computed(() => {
@@ -564,252 +570,43 @@ function submitRegister() {
 </style>
 
 <style lang="scss" scoped>
-
-.form-wrapper {
-  position: fixed;
-  right: 0;
-  height: 100%;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  @media (max-width: 767px) {
-    width: 100%;
-  }
-}
-
-.container {
-  background: v-bind(loginOpacity);
-  padding-left: 40px;
-  padding-right: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 450px;
-  height: 100%;
-  border-left: 1px solid var(--login-border);
-  box-shadow: var(--el-box-shadow-light);
-  @media (max-width: 1024px) {
-    padding: 20px 18px;
-    width: 384px;
-    margin-left: 18px;
-  }
-  @media (max-width: 767px) {
-    border: 1px solid var(--login-border);
-    padding: 20px 18px;
-    border-radius: 6px;
-    height: fit-content;
-    width: 100%;
-    margin-right: 18px;
-    margin-left: 18px;
-  }
-
-  .btn {
-    height: 36px;
-    width: 100%;
-    border-radius: 6px;
-  }
-
-  .form-desc {
-    margin-top: 5px;
-    margin-bottom: 18px;
-    color: var(--form-desc-color);
-  }
-
-  .form-title {
-    font-weight: bold;
-    font-size: 22px !important;
-  }
-
-  .switch {
-    margin-top: 20px;
-    text-align: center;
-
-    span {
-      color: var(--login-switch-color);
-      cursor: pointer;
-    }
-  }
-
-  :deep(.el-input__wrapper) {
-    border-radius: 6px;
-    background: var(--el-bg-color);
-  }
-
-  .email-input :deep(.el-input__wrapper) {
-    border-radius: 6px 0 0 6px;
-    background: var(--el-bg-color);
-  }
-
-  .el-input {
-    height: 38px;
-    width: 100%;
-    margin-bottom: 18px;
-
-    :deep(.el-input__inner) {
-      height: 36px;
-    }
-  }
-}
-
-:deep(.el-select-dropdown__item) {
-  padding: 0 10px;
-}
-
-:deep(.bind-dialog) {
-  width: 400px !important;
-  @media (max-width: 440px) {
-    width: calc(100% - 40px) !important;
-    margin-right: 20px !important;
-    margin-left: 20px !important;
-  }
-}
-
-.bind-container {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 15px;
-}
-
-.setting-icon {
-  position: relative;
-  top: 6px;
-}
-
-.github {
-  position: fixed;
-  width: 35px;
-  height: 35px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-  background: var(--el-bg-color);
-  bottom: 10px;
-  right: 10px;
-  z-index: 1000;
-  border: 1px solid var(--el-border-color-light);
-  box-shadow: var(--el-box-shadow-light);
-  cursor: pointer;
-}
-
-:deep(.el-input-group__append) {
-  padding: 0 !important;
-  padding-left: 8px !important;
-  padding-right: 4px !important;
-  background: var(--el-bg-color);
-  border-radius: 0 8px 8px 0;
-}
-
-:deep(.el-button+.el-button) {
-  margin: 0;
-}
-
-.register-turnstile {
-  margin-bottom: 18px;
-}
-
-.select {
-  position: absolute;
-  right: 30px;
-  width: 100px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.custom-style {
-  margin-bottom: 10px;
-}
-
-.custom-style .el-segmented {
-  --el-border-radius-base: 6px;
-  width: 180px;
-}
-
-
-#login-box {
-  background: linear-gradient(to bottom, #2980b9, #6dd5fa, #fff);
-  font: 100% Arial, sans-serif;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  display: grid;
-  grid-template-columns: 1fr;
-}
-
-
-#background-wrap {
-  height: 100%;
-  z-index: 0;
-}
-
-@keyframes animateCloud {
-  0% {
-    margin-left: -500px;
-  }
-
-  100% {
-    margin-left: 100%;
-  }
-}
-
-.x1 {
-  animation: animateCloud 30s linear infinite;
-  transform: scale(0.65);
-}
-
-.x2 {
-  animation: animateCloud 15s linear infinite;
-  transform: scale(0.3);
-}
-
-.x3 {
-  animation: animateCloud 25s linear infinite;
-  transform: scale(0.5);
-}
-
-.x4 {
-  animation: animateCloud 13s linear infinite;
-  transform: scale(0.4);
-}
-
-.x5 {
-  animation: animateCloud 20s linear infinite;
-  transform: scale(0.55);
-}
-
-.cloud {
-  background: linear-gradient(to bottom, #fff 5%, #f1f1f1 100%);
-  border-radius: 100px;
-  box-shadow: 0 8px 5px rgba(0, 0, 0, 0.1);
-  height: 120px;
-  width: 350px;
-  position: relative;
-}
-
-.cloud:after,
-.cloud:before {
-  content: "";
-  position: absolute;
-  background: #fff;
-  z-index: -1;
-}
-
-.cloud:after {
-  border-radius: 100px;
-  height: 100px;
-  left: 50px;
-  top: -50px;
-  width: 100px;
-}
-
-.cloud:before {
-  border-radius: 200px;
-  height: 180px;
-  width: 180px;
-  right: 50px;
-  top: -90px;
-}
-
+#login-box { position: relative; isolation: isolate; min-height: 100dvh; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(340px, .85fr); grid-template-rows: auto 1fr auto; gap: 24px 8vw; padding-inline: clamp(24px, 5vw, 88px); background: var(--mail-page); overflow: hidden; }
+.login-custom-background { position: absolute; inset: 0; z-index: -1; opacity: .16; pointer-events: none; }
+.login-brandbar { grid-column: 1/-1; min-height: 104px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--mail-rule); }
+.login-home { font-size: 12px; text-decoration: none; color: var(--mail-muted); min-height: 44px; display: inline-flex; align-items: center; gap: 16px; }
+.login-home span { color: var(--mail-accent); }
+.login-intro { align-self: center; min-width: 0; padding-block: 48px; }
+.login-eyebrow { display: flex; align-items: center; gap: 14px; font-size: 11px; letter-spacing: .16em; color: var(--mail-accent); }
+.login-eyebrow > span { width: 30px; height: 1px; background: var(--mail-accent); }
+.login-intro h1 { font: clamp(64px, 7.3vw, 110px)/1.03 var(--mail-serif); font-weight: 400; letter-spacing: -.065em; color: var(--mail-text); margin-block: 28px; }
+.login-intro h1 > span { color: var(--mail-accent); }
+.login-note { color: var(--mail-muted); font-size: 13px; line-height: 1.9; }
+.correspondence-mark { display: flex; align-items: baseline; justify-content: space-between; max-width: 430px; margin-top: 75px; padding-top: 20px; border-top: 1px solid var(--mail-rule); color: var(--mail-muted); font-size: 10px; letter-spacing: .1em; }
+.correspondence-mark > span:first-child { font: 26px var(--mail-serif); color: var(--mail-accent); letter-spacing: -.05em; }
+.form-wrapper { min-width: 0; width: 100%; max-width: 440px; align-self: center; justify-self: end; padding-block: 36px; }
+.container { background: v-bind(loginOpacity); border: 1px solid var(--mail-rule); padding: clamp(26px, 3vw, 44px); min-width: 0; display: flex; flex-direction: column; }
+.form-eyebrow { font-size: 10px; letter-spacing: .16em; color: var(--mail-accent); margin-bottom: 14px; }
+.form-title { font: 42px/1.1 var(--mail-serif); font-weight: 400; letter-spacing: -.045em; color: var(--mail-text); overflow-wrap: anywhere; }
+.form-title > span { color: var(--mail-accent); }
+.form-desc { color: var(--mail-muted); font-size: 12px; line-height: 1.7; margin-block: 14px 28px; }
+.container .el-input { width: 100%; height: 46px; margin-bottom: 16px; }
+.container :deep(.el-input__wrapper) { border-radius: 2px; background: var(--mail-panel); }
+.container :deep(.el-input__inner) { height: 44px; font-size: 13px; }
+.container .btn { width: 100%; min-height: 46px; border-radius: 2px; font-weight: 500; letter-spacing: .05em; }
+.container .switch { margin-top: 24px; padding-block: 10px; min-height: 44px; text-align: center; color: var(--mail-muted); font-size: 12px; cursor: pointer; }
+.container .switch span { color: var(--mail-accent); margin-left: 6px; border-bottom: 1px solid var(--mail-rule); padding-bottom: 3px; }
+.container :deep(.el-input-group__append) { padding: 0 8px; background: var(--mail-panel); border-radius: 0 2px 2px 0; font-size: 12px; }
+.container :deep(.el-button + .el-button) { margin-left: 0; }
+.container .email-input :deep(.el-input__wrapper) { border-radius: 2px 0 0 2px; }
+.setting-icon { position: relative; top: 4px; }
+.select { position: absolute; right: 30px; width: 100px; opacity: 0; pointer-events: none; }
+.register-turnstile { margin-bottom: 18px; max-width: 100%; overflow: auto; }
+.bind-container { display: grid; grid-template-columns: minmax(0, 1fr); gap: 15px; }
+:deep(.bind-dialog) { width: min(400px, calc(100% - 32px)); }
+.login-footer { grid-column: 1/-1; display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 72px; border-top: 1px solid var(--mail-rule); color: var(--mail-muted); font-size: 10px; letter-spacing: .1em; }
+.login-footer a { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; color: var(--mail-muted); text-decoration: none; }
+.login-footer a span { color: var(--mail-accent); }
+@media (max-width: 1000px) { #login-box { gap: 24px 5vw; grid-template-columns: minmax(0, 1fr) minmax(320px, 1fr); padding-inline: 32px; } .login-intro h1 { font-size: clamp(56px, 7vw, 80px); } .correspondence-mark { margin-top: 48px; } }
+@media (max-width: 767px) { #login-box { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-inline: max(22px, env(safe-area-inset-left)) max(22px, env(safe-area-inset-right)); } .login-brandbar { min-height: 80px; } .login-home { gap: 8px; font-size: 11px; } .login-intro { padding: 12px 0 0; } .login-eyebrow { font-size: 10px; } .login-intro h1 { font-size: clamp(40px, 9.7vw, 66px); margin-block: 16px 0; } .login-intro h1 br { display: none; } .login-note, .correspondence-mark { display: none; } .form-wrapper { justify-self: center; max-width: 440px; padding: 0 0 12px; } .container { padding: 28px 24px; } .form-title { font-size: 36px; } .form-desc { margin-block: 12px 22px; } .login-footer { min-height: 60px; font-size: 9px; } }
+@media (max-width: 360px) { #login-box { padding-inline: 16px; } .container { padding: 26px 20px; } .login-brandbar .mail-brand { gap: 8px; } .login-intro h1 { font-size: 38px; } }
 </style>

@@ -10,9 +10,9 @@
           <span class="sender-name">{{ form.name }}</span>
           <span class="send-email"><{{ form.sendEmail }}></span>
         </div>
-        <div @click="close" style="cursor: pointer;">
-          <Icon icon="material-symbols-light:close-rounded" width="22" height="22"/>
-        </div>
+        <button type="button" class="mail-action close-writer" :aria-label="$t('closeCompose')" @click="close">
+          <Icon icon="material-symbols-light:close-rounded" width="22" height="22" aria-hidden="true"/>
+        </button>
       </div>
       <div class="container">
         <el-input-tag  @add-tag="addTagChange" tag-type="primary" @input="inputChange" size="default" v-model="form.receiveEmail" >

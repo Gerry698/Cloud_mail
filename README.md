@@ -4,6 +4,8 @@
 
 本地验证：在 `mail-vue` 目录执行 `pnpm install --frozen-lockfile`、`pnpm run build`。这两步只安装和构建，不发布、不调用数据库初始化。不要把 `mail-worker` 的 `test` 命令当作测试，它会部署到测试 Worker。
 
+邮箱沿用个人站的墨蓝、暖纸和淡金视觉；集中配色与组件映射在 `mail-vue/src/mail-theme.css`，品牌/登录布局分别在 `layout/aside` 与 `views/login`。未保存偏好时默认深色，已有浅色选择继续保留；写信编辑器与收到邮件的正文样式独立，主题只调整应用界面。
+
 `mail-worker/wrangler.toml` 保留现有 D1 `db` 和 KV `kv` 的资源 ID，`keep_vars = true` 保留后台运行变量；密码和令牌由 Cloudflare 管理，不写进仓库。更换资源或修改后台绑定前先核对配置，避免部署覆盖绑定。
 
 `.github/workflows/deploy-cloudflare.yml` 是旧版初始化/维护流程，仅可手动运行。它可能创建资源并调用 `/api/init/…`，不用于日常界面更新。生产合并后在 Cloudflare 确认构建成功，检查登录页、收件箱、手机导航与邮箱切换；验证时不发送或删除真实邮件。需要回滚时，在 Worker 的部署记录恢复上一个正常版本，再回退代码，避免下一次 Git 构建重新发布问题版本。

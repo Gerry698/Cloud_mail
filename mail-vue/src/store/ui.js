@@ -10,7 +10,8 @@ export const useUiStore = defineStore('ui', {
         changePreview: 0,
         previewData: {},
         key: 0,
-        dark: false,
+        // Persisted user choices still override this default during hydration.
+        dark: true,
         asideCount: {
             email: 0,
             send: 0,
