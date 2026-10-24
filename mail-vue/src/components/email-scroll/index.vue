@@ -3,6 +3,7 @@
     <div class="header-actions">
       <el-checkbox
           v-model="checkAll"
+          :aria-label="$t('selectAllMail')"
           :indeterminate="isIndeterminate"
           :disabled="!emailList.length || loading"
           @change="handleCheckAllChange"
@@ -11,19 +12,14 @@
       <div class="header-left" :style="'padding-left:' + actionLeft">
 
         <slot name="first"></slot>
-        <Icon class="icon reload" icon="ion:reload" width="18" height="18" @click="refresh"/>
-        <Icon v-perm="'email:delete'" class="icon delete" icon="uiw:delete" width="16" height="16"
-              v-if="getSelectedMailsIds().length > 0"
-              @click="handleDelete"/>
-        <Icon v-perm="'email:delete'" class="icon delete" icon="fluent:mail-read-20-regular" width="21" height="21"
-              v-if="getSelectedMailsIds().length > 0 && showUnread"
-              @click="handleRead"/>
+        <button type="button" class="mail-action" :aria-label="$t('refreshMail')" :title="$t('refreshMail')" @click="refresh"><Icon icon="ion:reload" width="18" height="18" aria-hidden="true"/></button>
+        <button type="button" v-perm="'email:delete'" v-if="getSelectedMailsIds().length > 0" class="mail-action" :aria-label="$t('delete')" :title="$t('delete')" @click="handleDelete"><Icon icon="uiw:delete" width="16" height="16" aria-hidden="true"/></button>
+        <button type="button" v-perm="'email:delete'" v-if="getSelectedMailsIds().length > 0 && showUnread" class="mail-action" :aria-label="$t('markAsRead')" :title="$t('markAsRead')" @click="handleRead"><Icon icon="fluent:mail-read-20-regular" width="21" height="21" aria-hidden="true"/></button>
       </div>
 
       <div class="header-right">
         <span class="email-count" v-if="total">{{ $t('emailCount', {total: total}) }}</span>
-        <Icon v-if="showAccountIcon" class="more-icon icon" width="16" height="16" icon="akar-icons:dot-grid-fill"
-              @click="changeAccountShow"/>
+        <button type="button" v-if="showAccountIcon" class="mail-action mailbox-toggle" data-mailbox-toggle :aria-label="$t('mailboxes')" :aria-expanded="accountShow" aria-controls="mail-mailboxes" @click="changeAccountShow"><Icon width="18" height="18" icon="akar-icons:dot-grid-fill" aria-hidden="true"/><span>{{ $t('mailboxes') }}</span></button>
       </div>
     </div>
 
@@ -40,6 +36,8 @@
           <template #default="{ data: item, index }" >
             <div :class="'email-row ' + props.type"
                  :data-checked="item.checked"
+                 :data-unread="showUnread && item.unread === EmailUnreadEnum.UNREAD"
+                 tabindex="0" @keydown.enter.self="jumpDetails(item)"
                  @click="jumpDetails(item)"
                  v-if="!item.expand"
                  :key="item.emailId"
@@ -47,11 +45,11 @@
                  :style="item.rightChecked ? 'background: #FDF6EC' : ''"
             >
               <el-checkbox :class=" props.type === 'all-email' ? 'all-email-checkbox' : 'checkbox'"
-                           v-model="item.checked" @click.stop></el-checkbox>
-              <div @click.stop="starChange(item)" class="pc-star" v-if="showStar">
-                <Icon v-if="item.isStar" icon="fluent-color:star-16" width="20" height="20"/>
-                <Icon v-else icon="solar:star-line-duotone" width="18" height="18"/>
-              </div>
+                           :aria-label="$t('selectMessage')" v-model="item.checked" @click.stop></el-checkbox>
+              <button type="button" @click.stop="starChange(item)" class="pc-star star-toggle" v-if="showStar" :aria-label="$t('star')" :aria-pressed="!!item.isStar">
+                <Icon v-if="item.isStar" icon="fluent-color:star-16" width="20" height="20" aria-hidden="true"/>
+                <Icon v-else icon="solar:star-line-duotone" width="18" height="18" aria-hidden="true"/>
+              </button>
               <div v-if="!showStar"></div>
               <div class="title" :class="accountShow ? 'title-column' : 'title-column'">
 
@@ -352,6 +350,7 @@ onActivated(() => {
 })
 
 onMounted(() => {
+  window.addEventListener('resize', handleResize)
   timer = setInterval(() => {
     emailList.forEach(email => {
       email.formatCreateTime = fromNow(email.createTime);
@@ -360,13 +359,14 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
   clearInterval(timer)
 })
 
 getEmailList()
 
-window.onresize = () => {
-  isMobile.value = innerWidth < 1367
+function handleResize() {
+  isMobile.value = window.innerWidth < 1367
 }
 
 function onScroll(e) {
@@ -600,6 +600,7 @@ function starChange(email) {
 
 function changeAccountShow() {
   uiStore.accountShow = !uiStore.accountShow;
+  if (uiStore.accountShow && window.innerWidth < 768) uiStore.asideShow = false
 }
 
 const handleRead = () => {
@@ -1311,5 +1312,19 @@ ul {
   padding: 0;
   margin: 0;
 }
+
+
+.header-actions { min-width: 0; gap: 8px; min-height: 52px; padding: 4px 12px; grid-template-columns: auto minmax(0, 1fr) auto; }
+.header-actions .header-left { gap: 2px; min-width: 0; }
+.header-actions .header-right { display: flex; align-items: center; gap: 8px; }
+.header-actions .header-right .email-count { margin: 0; color: var(--regular-text-color); font-size: 12px; }
+.mailbox-toggle { padding: 0 8px; white-space: nowrap; font-size: 13px; }
+:deep(.email-row) { min-width: 0; }
+:deep(.email-row[data-checked="true"]) { background: var(--choose-account-background); }
+:deep(.email-row[data-unread="true"]) { box-shadow: inset 3px 0 var(--el-color-primary), var(--header-actions-border); }
+:deep(.email-row .title) { min-width: 0; grid-template-columns: minmax(0, 240px) minmax(0, 1fr); }
+:deep(.email-row .title > div), :deep(.email-row .email-text), :deep(.email-row .email-sender), :deep(.email-row .name) { min-width: 0; }
+:deep(.email-row .star-toggle) { min-width: 32px; min-height: 32px; align-items: center; justify-content: center; cursor: pointer; }
+@media (max-width: 767px) { .header-actions { gap: 4px; padding: 4px 8px; } .header-actions .header-right .email-count { display: none; } :deep(.email-row .checkbox) { padding-left: 12px; padding-right: 14px; min-height: 44px; } }
 
 </style>

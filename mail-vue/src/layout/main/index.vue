@@ -1,7 +1,7 @@
 <template>
   <div :class="accountShow && hasPerm('account:query') ? 'main-box-show' : 'main-box-hide'">
     <div :class="accountShow && hasPerm('account:query') ? 'block-show' : 'block-hide'" @click="uiStore.accountShow = false"></div>
-    <account  :class="accountShow && hasPerm('account:query') ? 'show' : 'hide'" />
+    <account id="mail-mailboxes" role="complementary" :aria-label="$t('mailboxes')" tabindex="-1" :inert="!(accountShow && hasPerm('account:query'))" :aria-hidden="!(accountShow && hasPerm('account:query'))" :class="accountShow && hasPerm('account:query') ? 'show' : 'hide'" />
     <router-view class="main-view" v-slot="{ Component,route }">
       <keep-alive :include="['email','all-email','send','sys-setting','star','user','role','analysis','reg-key','draft']">
         <component :is="Component" :key="route.name"/>
@@ -13,14 +13,15 @@
 import account from '@/layout/account/index.vue'
 import {useUiStore} from "@/store/ui.js";
 import {useSettingStore} from "@/store/setting.js";
-import {computed, onBeforeUnmount, onMounted, watch} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {useDrawerFocus} from "@/utils/drawer-focus.js";
 import { useRoute } from 'vue-router'
 import { hasPerm } from "@/perm/perm.js"
 
 const settingStore = useSettingStore()
 const uiStore = useUiStore();
 const route = useRoute()
-let  innerWidth =  window.innerWidth
+const isMobile = ref(window.innerWidth < 768)
 
 let elNotification = null
 
@@ -91,13 +92,11 @@ onBeforeUnmount(() => {
 })
 
 const handleResize = () => {
-  if (['content','email','send'].includes(route.meta.name)) {
-    if (innerWidth !==  window.innerWidth) {
-      innerWidth = window.innerWidth;
-      uiStore.accountShow = window.innerWidth >= 767;
-    }
-  }
+  const mobile = window.innerWidth < 768
+  if (mobile !== isMobile.value && ['content','email','send'].includes(route.meta.name)) uiStore.accountShow = !mobile
+  isMobile.value = mobile
 }
+useDrawerFocus(computed(() => isMobile.value && accountShow.value && hasPerm('account:query')), 'mail-mailboxes', '[data-mailbox-toggle]', () => { uiStore.accountShow = false })
 
 </script>
 <style lang="scss" scoped>
@@ -177,4 +176,14 @@ const handleResize = () => {
     margin-left: 5px;
   }
 }
+
+.main-box-show { grid-template-columns: 260px minmax(0, 1fr); position: relative; min-width: 0; }
+.main-box-hide { grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.main-view { min-width: 0; overflow: hidden; }
+@media (max-width: 767px) {
+  .main-box-show { grid-template-columns: minmax(0, 1fr); }
+  .show, .hide { top: 60px; bottom: 0; height: calc(100dvh - 60px); max-width: calc(100vw - 44px); }
+}
+@media (prefers-reduced-motion: reduce) { .show, .hide, .block-show, .block-hide { transition: none; } }
+
 </style>

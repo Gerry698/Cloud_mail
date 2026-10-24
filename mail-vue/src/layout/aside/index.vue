@@ -4,6 +4,7 @@
       <div class="title" >
         <Icon icon="mdi:email-outline" width="24" height="24" />
         <div>{{settingStore.settings.title}}</div>
+        <button type="button" class="close-navigation" :aria-label="$t('closeNavigation')" @click="uiStore.asideShow = false"><Icon icon="mdi:close" width="22" height="22" aria-hidden="true"/></button>
       </div>
       <el-menu :collapse="false" text-color="#fff" active-text-color="#fff" style="margin-top: 10px">
         <el-menu-item @click="router.push({name: 'email'})" index="email"
@@ -75,6 +76,9 @@ import { useRoute } from "vue-router";
 import {Icon} from "@iconify/vue";
 import {useSettingStore} from "@/store/setting.js";
 
+import {useUiStore} from "@/store/ui.js";
+
+const uiStore = useUiStore();
 const settingStore = useSettingStore();
 const route = useRoute();
 
@@ -176,4 +180,8 @@ const route = useRoute();
 .scroll {
 
 }
+
+.close-navigation { display: none; color: #fff; min-width: 44px; min-height: 44px; cursor: pointer; border-radius: 6px; }
+@media (max-width: 1024px) { .title { padding-right: 0; } .close-navigation { display: inline-flex; align-items: center; justify-content: center; margin-left: auto; } .el-menu-item { height: 44px; } }
+
 </style>

@@ -2,6 +2,8 @@
   <el-container class="layout">
     <el-aside
         class="aside"
+        id="mail-navigation" role="navigation" :aria-label="$t('navigation')" tabindex="-1"
+        :inert="!uiStore.asideShow" :aria-hidden="!uiStore.asideShow"
         :class="uiStore.asideShow ? 'aside-show' : 'el-aside-hide'">
       <Aside />
     </el-aside>
@@ -25,7 +27,8 @@
 import Aside from '@/layout/aside/index.vue'
 import Header from '@/layout/header/index.vue'
 import Main from '@/layout/main/index.vue'
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import {useDrawerFocus} from '@/utils/drawer-focus.js'
 import {useUiStore} from "@/store/ui.js";
 import writer from '@/layout/write/index.vue'
 
@@ -33,9 +36,11 @@ const uiStore = useUiStore();
 const writerRef = ref({})
 const isMobile = ref(window.innerWidth < 1025)
 const handleResize = () => {
-  isMobile.value = window.innerWidth < 1025
-  uiStore.asideShow = window.innerWidth > 1024;
+  const mobile = window.innerWidth < 1025
+  if (mobile !== isMobile.value) uiStore.asideShow = !mobile
+  isMobile.value = mobile
 }
+useDrawerFocus(computed(() => isMobile.value && uiStore.asideShow), 'mail-navigation', '[data-mail-navigation-toggle]', () => { uiStore.asideShow = false })
 
 onMounted(() => {
   uiStore.writerRef = writerRef
@@ -122,4 +127,11 @@ onBeforeUnmount(() => {
   pointer-events: none;
   opacity: 0;
 }
+
+.layout { height: 100dvh; }
+.main-container, .el-main { min-width: 0; height: 100%; }
+.el-aside { flex-shrink: 0; }
+.overlay-show { height: 100dvh; }
+@media (prefers-reduced-motion: reduce) { .el-aside, .overlay-show { transition: none; } }
+
 </style>
