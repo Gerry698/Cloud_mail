@@ -1,3 +1,15 @@
+## 本站维护（mail.g3rry.com）
+
+日常发布使用 Cloudflare Worker `cloud-mail` 已连接的 Git 构建：生产分支为 `main`，项目根目录为 `/mail-worker`，执行现有 `npx wrangler deploy`。Wrangler 的 `[build]` 会安装并构建 `mail-vue`，产物写入 `mail-worker/dist`。前端 API 继续使用同域 `/api`。
+
+本地验证：在 `mail-vue` 目录执行 `pnpm install --frozen-lockfile`、`pnpm run build`。这两步只安装和构建，不发布、不调用数据库初始化。不要把 `mail-worker` 的 `test` 命令当作测试，它会部署到测试 Worker。
+
+`mail-worker/wrangler.toml` 保留现有 D1 `db` 和 KV `kv` 的资源 ID，`keep_vars = true` 保留后台运行变量；密码和令牌由 Cloudflare 管理，不写进仓库。更换资源或修改后台绑定前先核对配置，避免部署覆盖绑定。
+
+`.github/workflows/deploy-cloudflare.yml` 是旧版初始化/维护流程，仅可手动运行。它可能创建资源并调用 `/api/init/…`，不用于日常界面更新。生产合并后在 Cloudflare 确认构建成功，检查登录页、收件箱、手机导航与邮箱切换；验证时不发送或删除真实邮件。需要回滚时，在 Worker 的部署记录恢复上一个正常版本，再回退代码，避免下一次 Git 构建重新发布问题版本。
+
+---
+
 <p align="center">
     <img src="doc/demo/logo.png" width="80px" />
     <h1 align="center">Cloud Mail</h1>
