@@ -42,7 +42,7 @@
                  v-if="!item.expand"
                  :key="item.emailId"
                  @contextmenu="handleContextmenu($event, item)"
-                 :style="item.rightChecked ? 'background: #FDF6EC' : ''"
+                 :style="item.rightChecked ? 'background: var(--choose-account-background)' : ''"
             >
               <el-checkbox :class=" props.type === 'all-email' ? 'all-email-checkbox' : 'checkbox'"
                            :aria-label="$t('selectMessage')" v-model="item.checked" @click.stop></el-checkbox>
