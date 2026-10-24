@@ -1,31 +1,31 @@
 <template>
   <div class="header" :class="!hasPerm('email:send') ? 'not-send' : ''">
     <div class="header-btn">
-      <hanburger @click="changeAside"></hanburger>
+      <hanburger :is-active="uiStore.asideShow" @toggle-click="changeAside"/>
       <span class="breadcrumb-item">{{ $t(route.meta.title) }}</span>
     </div>
-    <div v-perm="'email:send'" class="writer-box" @click="openSend">
+    <button type="button" v-perm="'email:send'" class="writer-box" :aria-label="$t('compose')" :title="$t('compose')" @click="openSend">
       <div class="writer">
         <Icon icon="material-symbols:edit-outline-sharp" width="22" height="22"/>
       </div>
-    </div>
+    </button>
     <div class="toolbar">
-      <div v-if="uiStore.dark" class="sun-icon icon-item" @click="openDark($event)">
-        <Icon icon="mingcute:sun-fill"/>
-      </div>
-      <div v-else class="dark-icon icon-item" @click="openDark($event)">
-        <Icon icon="solar:moon-linear"/>
-      </div>
-      <div class="notice icon-item" @click="openNotice">
-        <Icon icon="streamline-plump:announcement-megaphone"/>
-      </div>
+      <button type="button" v-if="uiStore.dark" class="sun-icon icon-item" :aria-label="$t('switchToLight')" :title="$t('switchToLight')" @click="openDark($event)">
+        <Icon icon="mingcute:sun-fill" aria-hidden="true"/>
+      </button>
+      <button type="button" v-else class="dark-icon icon-item" :aria-label="$t('switchToDark')" :title="$t('switchToDark')" @click="openDark($event)">
+        <Icon icon="solar:moon-linear" aria-hidden="true"/>
+      </button>
+      <button type="button" class="notice icon-item" :aria-label="$t('noticeTitle')" :title="$t('noticeTitle')" @click="openNotice">
+        <Icon icon="streamline-plump:announcement-megaphone" aria-hidden="true"/>
+      </button>
       <el-dropdown ref="userinfoRef" @visible-change="e => userInfoShow = e" :teleported="false" popper-class="detail-dropdown">
-        <div class="avatar" @click="userInfoHide" >
+        <button type="button" class="avatar" :aria-label="$t('profile')" :aria-expanded="userInfoShow" @click="userInfoHide">
           <div class="avatar-text">
             <div>{{ formatName(userStore.user.email) }}</div>
           </div>
           <Icon class="setting-icon" icon="mingcute:down-small-fill" width="24" height="24"/>
-        </div>
+        </button>
         <template #dropdown>
           <div class="user-details">
             <div class="details-avatar">
@@ -196,13 +196,14 @@ function openDark(e) {
   const nextIsDark = !uiStore.dark
   const root = document.documentElement
 
-  if (!document.startViewTransition) {
+  if (!document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     switchDark(nextIsDark, root);
     return
   }
 
-  const x = e.clientX
-  const y = e.clientY
+  const rect = e.currentTarget.getBoundingClientRect()
+  const x = e.detail ? e.clientX : rect.left + rect.width / 2
+  const y = e.detail ? e.clientY : rect.top + rect.height / 2
 
   const maxX = Math.max(x, window.innerWidth - x)
   const maxY = Math.max(y, window.innerHeight - y)
@@ -233,11 +234,14 @@ function switchDark(nextIsDark, root) {
 }
 
 function openSend() {
+  if (window.innerWidth < 768) uiStore.accountShow = false
+  if (window.innerWidth < 1025) uiStore.asideShow = false
   uiStore.writerRef.open()
 }
 
 function changeAside() {
   uiStore.asideShow = !uiStore.asideShow
+  if (uiStore.asideShow && window.innerWidth < 768) uiStore.accountShow = false
 }
 
 function clickLogout() {
@@ -473,7 +477,15 @@ function formatName(email) {
 
 }
 
-.el-tooltip__trigger:first-child:focus-visible {
-  outline: unset;
-}
+
+
+.header { grid-template-columns: minmax(0, auto) auto minmax(0, 1fr); gap: 6px; padding-right: max(8px, env(safe-area-inset-right)); }
+.header.not-send { grid-template-columns: minmax(0, auto) minmax(0, 1fr); }
+.writer-box { min-width: 44px; min-height: 44px; padding: 4px; margin: 0; border-radius: 8px; }
+.toolbar { gap: 4px; min-width: 0; }
+.toolbar .icon-item { width: 44px; height: 44px; flex-shrink: 0; color: var(--el-text-color-primary); border-radius: 8px; margin: 0; }
+.toolbar .avatar { min-height: 44px; min-width: 44px; justify-content: center; color: inherit; border-radius: 8px; }
+.toolbar .avatar .setting-icon { margin-right: 0; }
+@media (max-width: 480px) { .header { gap: 0; } .toolbar { gap: 0; } .toolbar .avatar .setting-icon { display: none; } .breadcrumb-item { font-size: 13px; } }
+
 </style>
