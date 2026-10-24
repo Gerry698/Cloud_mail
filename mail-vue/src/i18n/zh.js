@@ -1,4 +1,8 @@
 const zh = {
+    backToPersonalSite: '返回 g3rry.com 个人站',
+    mailWelcome: '日常往来，在这里继续。',
+    personalMail: '个人邮箱',
+    closeCompose: '关闭写信窗口',
     navigation: '导航',
     openNavigation: '打开导航',
     closeNavigation: '关闭导航',
