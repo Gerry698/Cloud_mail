@@ -1,27 +1,27 @@
 <template>
   <div class="account-box">
     <div class="head-opt">
-      <Icon v-perm="'account:add'" class="icon add" icon="ion:add-outline" width="23" height="23" @click="add"/>
-      <Icon class="icon refresh" icon="ion:reload" width="18" height="18" @click="refresh"/>
+      <span class="mailboxes-title">{{ $t('mailboxes') }}</span>
+      <button type="button" v-perm="'account:add'" class="mail-action" :aria-label="$t('addAccount')" :title="$t('addAccount')" @click="add"><Icon icon="ion:add-outline" width="23" height="23" aria-hidden="true"/></button>
+      <button type="button" class="mail-action" :aria-label="$t('refreshMailboxes')" :title="$t('refreshMailboxes')" @click="refresh"><Icon icon="ion:reload" width="18" height="18" aria-hidden="true"/></button>
+      <button type="button" class="mail-action close-mailboxes" :aria-label="$t('closeMailboxes')" @click="uiStore.accountShow = false"><Icon icon="mdi:close" width="22" height="22" aria-hidden="true"/></button>
     </div>
     <el-scrollbar class="scrollbar" ref="scrollbarRef">
       <div v-infinite-scroll="getAccountList" :infinite-scroll-distance="600" :infinite-scroll-immediate="false">
         <el-card class="item" :class="itemBg(item.accountId)" v-for="(item, index) in accounts" :key="item.accountId"
                  @click="changeAccount(item)">
-          <div class="account">
+          <button type="button" class="account" :aria-label="$t('selectMailbox') + ': ' + item.email" :aria-pressed="accountStore.currentAccountId === item.accountId" @click.stop="changeAccount(item)">
             {{ item.email }}
-          </div>
+          </button>
           <div class="opt">
             <div class="send-email" @click.stop>
               <Icon @click="setAllReceive(item)" v-if="!item.allReceive" icon="eva:email-fill" width="22" height="22" color="#fccb1a"/>
               <Icon @click="setAllReceive(item)" v-else icon="flat-color-icons:folder" width="22" height="22" color="#23c4f1" />
             </div>
             <div class="settings" @click.stop>
-              <Icon icon="fluent-color:clipboard-24" width="22" height="22" @click.stop="copyAccount(item.email)"/>
-              <Icon icon="fluent:settings-24-filled" width="21" height="21" color="#909399"
-                    v-if="showNullSetting(item)"/>
-              <el-dropdown v-else>
-                <Icon icon="fluent:settings-24-filled" width="21" height="21" color="#909399"/>
+              <button type="button" class="mail-action" :aria-label="$t('copy')" :title="$t('copy')" @click.stop="copyAccount(item.email)"><Icon icon="fluent-color:clipboard-24" width="22" height="22" aria-hidden="true"/></button>
+              <el-dropdown v-if="!showNullSetting(item)">
+                <button type="button" class="mail-action" :aria-label="$t('mailboxSettings')" :title="$t('mailboxSettings')"><Icon icon="fluent:settings-24-filled" width="21" height="21" aria-hidden="true"/></button>
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item v-if="hasPerm('email:send')" @click="openSetName(item)">{{ $t('rename') }}</el-dropdown-item>
@@ -144,9 +144,11 @@ import {useEmailStore} from "@/store/email.js";
 import {useUserStore} from "@/store/user.js";
 import {hasPerm} from "@/perm/perm.js"
 import {useI18n} from "vue-i18n";
+import {useUiStore} from "@/store/ui.js";
 import {AccountAllReceiveEnum} from "@/enums/account-enum.js";
 
 const {t} = useI18n();
+const uiStore = useUiStore();
 const userStore = useUserStore();
 const accountStore = useAccountStore();
 const settingStore = useSettingStore();
@@ -335,6 +337,7 @@ function refresh() {
 function changeAccount(account) {
   accountStore.currentAccountId = account.accountId
   accountStore.currentAccount = account
+  if (window.innerWidth < 768) uiStore.accountShow = false
 }
 
 function add() {
@@ -666,5 +669,15 @@ path[fill="#ffdda1"] {
   pointer-events: none;
   position: fixed;
 }
+
+
+.account-box .head-opt { height: 52px; gap: 0; padding: 0 6px 0 12px; }
+.mailboxes-title { font-weight: 600; flex: 1; min-width: 0; }
+.account-box .scrollbar { height: calc(100% - 52px); }
+.account-box .item { padding: 8px 10px; }
+.account-box .item .account { display: block; width: 100%; min-height: 44px; text-align: left; margin-bottom: 4px; cursor: pointer; color: var(--el-text-color-primary); }
+.account-box .item .opt .settings { gap: 0; }
+.close-mailboxes { display: none; }
+@media (max-width: 767px) { .close-mailboxes { display: inline-flex; } }
 
 </style>
