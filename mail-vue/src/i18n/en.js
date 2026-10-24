@@ -1,4 +1,8 @@
 const en = {
+    backToPersonalSite: 'Back to g3rry.com',
+    mailWelcome: 'A place for everyday correspondence.',
+    personalMail: 'Personal mail',
+    closeCompose: 'Close compose',
     navigation: 'Navigation',
     openNavigation: 'Open navigation',
     closeNavigation: 'Close navigation',
