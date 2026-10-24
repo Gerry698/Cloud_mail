@@ -228,8 +228,7 @@ function openDark(e) {
 function switchDark(nextIsDark, root) {
   root.setAttribute('class', nextIsDark ? 'dark' : '')
   const metaTag = document.getElementById('theme-color-meta');
-  const isMobile =  !window.matchMedia("(pointer: fine) and (hover: hover)").matches;
-  metaTag.setAttribute('content', nextIsDark ? (isMobile ? '#141414' : '#000000') : (isMobile ? '#FFFFFF' : '#F1F1F1'));
+  metaTag.setAttribute('content', nextIsDark ? '#101a24' : '#eee9df');
   uiStore.dark = nextIsDark
 }
 
@@ -384,7 +383,7 @@ function formatName(email) {
     height: 34px;
     border-radius: 50%;
     color: #ffffff;
-    background: linear-gradient(135deg, #1890ff, #3a80dd);
+    background: var(--mail-accent);
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
